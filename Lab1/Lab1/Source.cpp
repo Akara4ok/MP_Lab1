@@ -1,5 +1,4 @@
 #include <iostream>
-#include <stdio.h>
 
 int main() {
 	//initial stage
@@ -124,24 +123,32 @@ skipFunctions:
 		if (allText[i] == ' ' || allText[i] == '\n' || allText[i] == EOF) //parse word
 		{
 			nextWord = i;
-			for (int i = 0; i < nextWord - prevWord; i++)
+			if (nextWord == prevWord)
 			{
-				wordsArray[currentWordsArrayLen][i] = allText[prevWord + i];
-				currentWordsLen[currentWordsArrayLen]++;
-				if (currentWordsLen[currentWordsArrayLen] >= wordsLen[currentWordsArrayLen])
-				{	
-					wordsLen[currentWordsArrayLen] *= 2;
-					newLen = wordsLen[currentWordsArrayLen];
-					oldArrayChar = &wordsArray[currentWordsArrayLen];
-					__asm {
-						push i
-						push offset continue_pushing_word
-					}
-					goto expand_char;
-				}
-			continue_pushing_word:
-				int k;
+				prevWord++;
+				goto continue_reading;
 			}
+			__asm push i;
+			i = 0;
+		copy_word: // copy by symbols
+			wordsArray[currentWordsArrayLen][i] = allText[prevWord + i];
+			currentWordsLen[currentWordsArrayLen]++;
+			if (currentWordsLen[currentWordsArrayLen] >= wordsLen[currentWordsArrayLen]) // expand word
+			{	
+				wordsLen[currentWordsArrayLen] *= 2;
+				newLen = wordsLen[currentWordsArrayLen];
+				oldArrayChar = &wordsArray[currentWordsArrayLen];
+				__asm {
+					push i
+					push offset continue_pushing_word
+				}
+				goto expand_char;
+			}
+			continue_pushing_word:
+					i++;
+					if (i < nextWord - prevWord)
+						goto copy_word;
+			__asm pop i;
 			prevWord = nextWord + 1;
 			currentWordsArrayLen++;
 
@@ -156,12 +163,15 @@ skipFunctions:
 				}
 				goto expand_int;
 			expand_current_length:
-				for (int i = 0; i < wordsArrayLen; i++)
-				{
+				__asm push i;
+				i = 0;
+			initialize_starter_len:
 					if (wordsLen[i] == 0)
 						wordsLen[i] = 10;
-				}
-
+					i++;
+					if (i < wordsArrayLen)
+						goto initialize_starter_len;
+				__asm pop i;
 				oldArrayInt = &currentWordsLen;
 				__asm {
 					push i;
