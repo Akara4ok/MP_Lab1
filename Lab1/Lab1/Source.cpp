@@ -13,7 +13,7 @@ int main() {
 	int wordsArrayLen = 10;
 	int currentWordsArrayLen = 0;
 	char** wordsArray = new char* [wordsArrayLen];
-
+	int* termFreequency = new int[wordsArrayLen];
 
 	int* wordsLen = new int[wordsArrayLen];
 	int* currentWordsLen = new int[wordsArrayLen]();
@@ -108,6 +108,10 @@ skipFunctions:
 		i = 0;
 	reading:
 		allText[i] = fgetc(fp);
+		if (allText[i] <= 90 && allText[i] >= 65)
+		{
+			allText[i] += 32;
+		}
 		currentAllTextLen++;
 		if (currentAllTextLen >= allTextLen)
 		{
