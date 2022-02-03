@@ -3,6 +3,7 @@
 int main() {
 	//initial stage
 	int i = 0, j = 0, k = 0; // for loops
+	bool fl = true;
 	int prevWord = 0;
 	int nextWord = 0;
 
@@ -10,10 +11,10 @@ int main() {
 	int currentAllTextLen = 0;
 	char* allText = new char[allTextLen];
 
-	int wordsArrayLen = 10;
+	int wordsArrayLen = 15;
 	int currentWordsArrayLen = 0;
 	char** wordsArray = new char* [wordsArrayLen];
-	int* termFreequency = new int[wordsArrayLen];
+	int* termFreequency = new int[wordsArrayLen]();
 
 	int* wordsLen = new int[wordsArrayLen];
 	int* currentWordsLen = new int[wordsArrayLen]();
@@ -56,7 +57,7 @@ initialize_words:
 			allText = newArrayChar;
 
 		}
-		if (allText[i] == ' ' || allText[i] == '\n' || allText[i] == EOF) //parse word
+		if (allText[i] < 97 || allText[i] > 122) //parse word
 		{
 			nextWord = i;
 			if (nextWord == prevWord)
@@ -85,8 +86,40 @@ initialize_words:
 					j++;
 					if (j < nextWord - prevWord)
 						goto copy_word;
-			prevWord = nextWord + 1;
+					prevWord = nextWord + 1;
+
+
+			j = 0;   //find a word in the array
+			if (currentWordsArrayLen != 0)
+			{
+			finding_word:
+				fl = true;
+				if (currentWordsLen[currentWordsArrayLen] != currentWordsLen[j])
+					fl = false;
+				if (fl)
+				{
+					k = 0;
+				compare_words:
+					if (wordsArray[currentWordsArrayLen][k] != wordsArray[j][k])
+					{
+						fl = false;
+					}
+					k++;
+					if (fl && k < currentWordsLen[currentWordsArrayLen])
+						goto compare_words;
+				}
+				if (fl)
+				{
+					termFreequency[j]++;
+					currentWordsLen[currentWordsArrayLen] = 0;
+					currentWordsArrayLen--;
+				}
+				j++;
+				if (!fl && j < currentWordsArrayLen)
+					goto finding_word;
+			}
 			currentWordsArrayLen++;
+
 
 			if (currentWordsArrayLen >= wordsArrayLen) //expand word array
 			{
@@ -94,7 +127,7 @@ initialize_words:
 				newArrayInt = new int[wordsArrayLen]();
 				j = 0;
 			expand_int_rewrite1:
-				newArrayInt[i] = wordsLen[i];
+				newArrayInt[j] = wordsLen[j];
 				j++;
 				if (j < wordsArrayLen / 2)
 					goto expand_int_rewrite1;
@@ -106,6 +139,8 @@ initialize_words:
 				delete[] wordsLen;
 				wordsLen = newArrayInt;
 
+
+
 				newArrayInt = new int[wordsArrayLen](); //expand current length
 				j = 0;
 			expand_int_rewrite2:
@@ -115,6 +150,16 @@ initialize_words:
 					goto expand_int_rewrite2;
 				delete[] currentWordsLen;
 				currentWordsLen = newArrayInt;
+
+				newArrayInt = new int[wordsArrayLen](); //expand term frequency
+				j = 0;
+			expand_int_rewrite3:
+				newArrayInt[j] = termFreequency[j];
+				j++;
+				if (j < wordsArrayLen / 2)
+					goto expand_int_rewrite3;
+				delete[] termFreequency;
+				termFreequency = newArrayInt;
 
 				newArrayCharChars = new char* [wordsArrayLen]; //expand word array
 				j = 0;
@@ -141,15 +186,20 @@ initialize_words:
 			goto reading;
 		}
 
+
+
 		for (int i = 0; i < currentWordsArrayLen; i++)
 		{
 			for (int j = 0; j < currentWordsLen[i]; j++)
 			{
 				std::cout << wordsArray[i][j];
 			}
-			std::cout << "\n";
+			std::cout << " " << termFreequency[i] + 1 << "\n";
 		}
 	}
+
+
+
 	// end of reading input
 	return 0;
 }
