@@ -2,7 +2,7 @@
 
 int main() {
 	//initial stage
-	int i = 0;
+	int i = 0, j = 0, k = 0; // for loops
 	int prevWord = 0;
 	int nextWord = 0;
 
@@ -28,80 +28,9 @@ initialize_words:
 
 	FILE* fp;
 	//for expand
-	int newLen;
-	int** oldArrayInt;
-	char** oldArrayChar;
-	char*** oldArrayCharChars;
 	int* newArrayInt;
 	char* newArrayChar;
 	char** newArrayCharChars;
-
-	goto skipFunctions;
-	// expand arrays dynamically
-expand_int:
-	newArrayInt = new int[newLen]();
-
-	i = 0;
-expand_int_rewrite:
-	newArrayInt[i] = (*oldArrayInt)[i];
-	i++;
-	if (i < newLen / 2)
-		goto expand_int_rewrite;
-	delete[] * oldArrayInt;
-	*oldArrayInt = newArrayInt;
-	__asm {
-		pop eax
-		pop i
-		jmp eax;
-	}
-
-
-expand_char:
-	newArrayChar = new char[newLen];
-	i = 0;
-expand_char_rewrite:
-	newArrayChar[i] = (*oldArrayChar)[i];
-	++i;
-	if (i < newLen / 2)
-		goto expand_char_rewrite;
-	delete[] * oldArrayChar;
-	*oldArrayChar = newArrayChar;
-	__asm {
-		pop eax
-		pop i
-		jmp eax;
-	}
-
-
-expand_char_of_chars:
-	newArrayCharChars = new char* [newLen];
-
-	i = 0;
-expand_initialize_words:
-	newArrayCharChars[i] = new char[wordsLen[i]];
-	i++;
-	if (i < newLen)
-		goto expand_initialize_words;
-
-	i = 0;
-expand_char_of_chars_rewrite:
-	newArrayCharChars[i] = (*oldArrayCharChars)[i];
-	++i;
-	if (i < newLen / 2)
-		goto expand_char_of_chars_rewrite;
-	delete[](*oldArrayCharChars);
-	*oldArrayCharChars = newArrayCharChars;
-	__asm {
-		pop eax
-		pop i
-		jmp eax;
-	}
-	// end expand arrays dynamically
-
-
-
-// main
-skipFunctions:
 
 	//read input
 	if (fopen_s(&fp, "D:\\input.txt", "r") == 0) {
@@ -116,13 +45,16 @@ skipFunctions:
 		if (currentAllTextLen >= allTextLen)
 		{
 			allTextLen *= 2;
-			newLen = allTextLen;
-			oldArrayChar = &allText;
-			__asm {
-				push i;
-				push offset continue_reading
-			}
-			goto expand_char;
+			newArrayChar = new char[allTextLen];
+			j = 0;
+		expand_char_rewrite1:
+			newArrayChar[j] = allText[j];
+			j++;
+			if (j < allTextLen / 2)
+				goto expand_char_rewrite1;
+			delete[] allText;
+			allText = newArrayChar;
+
 		}
 		if (allText[i] == ' ' || allText[i] == '\n' || allText[i] == EOF) //parse word
 		{
@@ -132,64 +64,74 @@ skipFunctions:
 				prevWord++;
 				goto continue_reading;
 			}
-			__asm push i;
-			i = 0;
+			j = 0;
 		copy_word: // copy by symbols
-			wordsArray[currentWordsArrayLen][i] = allText[prevWord + i];
+			wordsArray[currentWordsArrayLen][j] = allText[prevWord + j];
 			currentWordsLen[currentWordsArrayLen]++;
 			if (currentWordsLen[currentWordsArrayLen] >= wordsLen[currentWordsArrayLen]) // expand word
 			{	
 				wordsLen[currentWordsArrayLen] *= 2;
-				newLen = wordsLen[currentWordsArrayLen];
-				oldArrayChar = &wordsArray[currentWordsArrayLen];
-				__asm {
-					push i
-					push offset continue_pushing_word
-				}
-				goto expand_char;
+				newArrayChar = new char[wordsLen[currentWordsArrayLen]];
+				k = 0;
+			expand_char_rewrite2:
+				newArrayChar[k] = wordsArray[currentWordsArrayLen][k];
+				k++;
+				if (k < wordsLen[currentWordsArrayLen] / 2)
+					goto expand_char_rewrite2;
+				delete[] wordsArray[currentWordsArrayLen];
+				wordsArray[currentWordsArrayLen] = newArrayChar;
 			}
 			continue_pushing_word:
-					i++;
-					if (i < nextWord - prevWord)
+					j++;
+					if (j < nextWord - prevWord)
 						goto copy_word;
-			__asm pop i;
 			prevWord = nextWord + 1;
 			currentWordsArrayLen++;
 
 			if (currentWordsArrayLen >= wordsArrayLen) //expand word array
 			{
-				wordsArrayLen *= 2;
-				newLen = wordsArrayLen;
-				oldArrayInt = &wordsLen;
-				__asm {
-					push i;
-					push offset expand_current_length
-				}
-				goto expand_int;
-			expand_current_length:
-				__asm push i;
-				i = 0;
+				wordsArrayLen *= 2;	//expand max length
+				newArrayInt = new int[wordsArrayLen]();
+				j = 0;
+			expand_int_rewrite1:
+				newArrayInt[i] = wordsLen[i];
+				j++;
+				if (j < wordsArrayLen / 2)
+					goto expand_int_rewrite1;
 			initialize_starter_len:
-					if (wordsLen[i] == 0)
-						wordsLen[i] = 10;
-					i++;
-					if (i < wordsArrayLen)
+					newArrayInt[j] = 10;
+					j++;
+					if (j < wordsArrayLen)
 						goto initialize_starter_len;
-				__asm pop i;
-				oldArrayInt = &currentWordsLen;
-				__asm {
-					push i;
-					push offset expand_words_array
-				}
-				goto expand_int;
+				delete[] wordsLen;
+				wordsLen = newArrayInt;
 
-			expand_words_array:
-				oldArrayCharChars = &wordsArray;
-				__asm {
-					push i;
-					push offset continue_reading
-				}
-				goto expand_char_of_chars;
+				newArrayInt = new int[wordsArrayLen](); //expand current length
+				j = 0;
+			expand_int_rewrite2:
+				newArrayInt[j] = currentWordsLen[j];
+				j++;
+				if (j < wordsArrayLen / 2)
+					goto expand_int_rewrite2;
+				delete[] currentWordsLen;
+				currentWordsLen = newArrayInt;
+
+				newArrayCharChars = new char* [wordsArrayLen]; //expand word array
+				j = 0;
+			expand_initialize_words1:
+				newArrayCharChars[j] = new char[wordsLen[j]];
+				j++;
+				if (j < wordsArrayLen)
+					goto expand_initialize_words1;
+
+				j = 0;
+			expand_char_of_chars_rewrite1:
+				newArrayCharChars[j] = wordsArray[j];
+				j++;
+				if (j < wordsArrayLen / 2)
+					goto expand_char_of_chars_rewrite1;
+				delete[]wordsArray;
+				wordsArray = newArrayCharChars;
 			}
 		}
 	continue_reading:
