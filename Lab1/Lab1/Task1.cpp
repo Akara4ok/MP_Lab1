@@ -1,4 +1,4 @@
-#include <iostream>
+#include<stdio.h>
 
 int main() {
 	//initial stage
@@ -7,6 +7,8 @@ int main() {
 	bool isStopWord = false;
 	int prevWord = 0;
 	int nextWord = 0;
+
+	const int N = 25; // first n words
 
 	int allTextLen = 10;
 	int currentAllTextLen = 0;
@@ -19,6 +21,7 @@ int main() {
 
 	int* wordsLen = new int[wordsArrayLen];
 	int* currentWordsLen = new int[wordsArrayLen]();
+	char* intToString;
 
 	i = 0;
 initialize_words:
@@ -37,6 +40,16 @@ initialize_words:
 	int* newArrayInt;
 	char* newArrayChar;
 	char** newArrayCharChars;
+
+	//for sort
+	int temp;
+	char* tempWord;
+
+
+	//for output
+	int copyInt;
+	int count;
+
 
 	//read input
 	if (fopen_s(&fp, "D:\\input.txt", "r") == 0) {
@@ -93,6 +106,7 @@ initialize_words:
 						goto copy_word;
 
 					wordsArray[currentWordsArrayLen][j] = '\0';
+					currentWordsLen[currentWordsArrayLen]++;
 
 					prevWord = nextWord + 1;
 
@@ -120,6 +134,12 @@ initialize_words:
 				}
 
 
+				if (isOldWord) //dont remember word
+				{
+					termFreequency[j]++;
+					currentWordsLen[currentWordsArrayLen] = 0;
+					currentWordsArrayLen--;
+				}
 				j++;
 				if (!isOldWord && j < currentWordsArrayLen)
 					goto finding_word;
@@ -127,23 +147,23 @@ initialize_words:
 			}
 			if (!isOldWord) //find word in stop words
 			{
-				for (int i = 0; i < stopWordsLen; i++)
-				{
-					isStopWord = true;
-					k = 0;
-					while (stopWords[i][k] != '\0' && stopWords[i][k] == wordsArray[currentWordsArrayLen][k])
+				j = 0;
+			finding_stop_words:
+				isStopWord = true;
+				k = 0;
+				compare_with_stop_words:
+					if (stopWords[j][k] != '\0' && stopWords[j][k] == wordsArray[currentWordsArrayLen][k])
+					{
 						k++;
-					if (stopWords[i][k] != wordsArray[currentWordsArrayLen][k])
-						isStopWord = false;
-					if (isStopWord)
-						break;
+						goto compare_with_stop_words;
+					}
+				if (stopWords[j][k] != wordsArray[currentWordsArrayLen][k])
+				{
+					isStopWord = false;
 				}
-			}
-			if (isOldWord) //dont remember word
-			{
-				termFreequency[j - 1]++;
-				currentWordsLen[currentWordsArrayLen] = 0;
-				currentWordsArrayLen--;
+				j++;
+				if(!isStopWord && j + 1 < stopWordsLen)
+					goto finding_stop_words;
 			}
 			if (isStopWord)
 			{
@@ -219,14 +239,134 @@ initialize_words:
 		}
 
 
+		//sort
+		i = 0;
+	sort_outer_loop:
+		j = i + 1;
+		sort_inner_loop:
+			if (termFreequency[i] < termFreequency[j])
+			{
+				temp = termFreequency[i]; //swap tempFreequency
+				termFreequency[i] = termFreequency[j];
+				termFreequency[j] = temp;
 
-		for (int i = 0; i < currentWordsArrayLen; i++)
-		{
-				std::cout << wordsArray[i];
-			std::cout << " " << termFreequency[i] + 1 << "\n";
-		}
+				tempWord = wordsArray[i]; //swap words
+				wordsArray[i] = wordsArray[j];
+				wordsArray[j] = tempWord;
+
+				temp = wordsLen[i]; //swap mex len words
+				wordsLen[i] = wordsLen[j];
+				wordsLen[j] = temp;
+
+				temp = currentWordsLen[i]; //swap current len words
+				currentWordsLen[i] = currentWordsLen[j];
+				currentWordsLen[j] = temp;
+			}
+			j++;
+			if (j < currentWordsArrayLen)
+				goto sort_inner_loop;
+		i++;
+		if (i < currentWordsArrayLen - 1)
+			goto sort_outer_loop;
 	}
+	fclose(fp);
 
-	// end of reading input
+
+
+	//output result
+
+	if (fopen_s(&fp, "D:\\output.txt", "w") == 0) {
+		//for (int i = 0; i < currentWordsArrayLen; i++)
+		//{
+		//	/*std::cout << wordsArray[i];
+		//	std::cout << " " << termFreequency[i] + 1 << "\n";*/
+
+		//	wordsArray[i][currentWordsLen[i] - 1] = ' ';
+		//	copyInt = termFreequency[i] + 1;
+		//	count = 0;;
+		//	intToString = new char[10];
+
+		//	j = 0;
+		//	while (copyInt > 0)
+		//	{
+		//		intToString[j] = (char)48 + (copyInt % 10);
+		//		copyInt = copyInt / 10;
+		//		j++;
+		//		count++;
+		//	}
+		//	for (int j = 0; j < count; j++)
+		//	{
+		//		wordsArray[i][currentWordsLen[i]] = intToString[count - 1 - j];
+		//		currentWordsLen[i]++;
+
+		//		if (currentWordsLen[currentWordsArrayLen] >= wordsLen[currentWordsArrayLen]) // expand string
+		//		{
+		//			wordsLen[currentWordsArrayLen] *= 2;
+		//			newArrayChar = new char[wordsLen[currentWordsArrayLen]];
+		//			k = 0;
+		//		expand_char_rewrite3:
+		//			newArrayChar[k] = wordsArray[currentWordsArrayLen][k];
+		//			k++;
+		//			if (k < wordsLen[currentWordsArrayLen] / 2)
+		//				goto expand_char_rewrite3;
+		//			delete[] wordsArray[currentWordsArrayLen];
+		//			wordsArray[currentWordsArrayLen] = newArrayChar;
+		//		}
+		//	}
+		//	wordsArray[i][currentWordsLen[i]] = '\n';
+		//	currentWordsLen[i]++;
+		//	wordsArray[i][currentWordsLen[i]] = '\0';
+		//	fputs(wordsArray[i], fp);
+		//	delete[] intToString;
+		//}
+
+		i = 0;
+	output_result:
+		wordsArray[i][currentWordsLen[i] - 1] = ' ';
+		copyInt = termFreequency[i] + 1;
+		count = 0;;
+		intToString = new char[10];
+
+		j = 0;
+		copy_int_in_string:
+			intToString[j] = (char)48 + (copyInt % 10);
+			copyInt = copyInt / 10;
+			j++;
+			count++;
+			if (copyInt > 0)
+				goto copy_int_in_string;
+
+		j = 0;
+		add_int_to_string:
+			wordsArray[i][currentWordsLen[i]] = intToString[count - 1 - j];
+			currentWordsLen[i]++;
+
+			if (currentWordsLen[currentWordsArrayLen] >= wordsLen[currentWordsArrayLen]) // expand string
+			{
+				wordsLen[currentWordsArrayLen] *= 2;
+				newArrayChar = new char[wordsLen[currentWordsArrayLen]];
+				k = 0;
+			expand_char_rewrite3:
+				newArrayChar[k] = wordsArray[currentWordsArrayLen][k];
+				k++;
+				if (k < wordsLen[currentWordsArrayLen] / 2)
+					goto expand_char_rewrite3;
+				delete[] wordsArray[currentWordsArrayLen];
+				wordsArray[currentWordsArrayLen] = newArrayChar;
+			}
+			j++;
+			if (j < count)
+				goto add_int_to_string;
+
+
+		wordsArray[i][currentWordsLen[i]] = '\n';
+		currentWordsLen[i]++;
+		wordsArray[i][currentWordsLen[i]] = '\0';
+		fputs(wordsArray[i], fp);
+		delete[] intToString;
+		i++;
+		if (i < currentWordsArrayLen)
+			goto output_result;
+	}
 	return 0;
 }
