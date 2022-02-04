@@ -3,7 +3,8 @@
 int main() {
 	//initial stage
 	int i = 0, j = 0, k = 0; // for loops
-	bool fl = true;
+	bool isOldWord = false;
+	bool isStopWord = false;
 	int prevWord = 0;
 	int nextWord = 0;
 
@@ -27,6 +28,10 @@ initialize_words:
 	if (i < wordsArrayLen)
 		goto initialize_words;
 
+
+	const char* stopWords[] = { "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now" };
+	int stopWordsLen = 127;
+
 	FILE* fp;
 	//for expand
 	int* newArrayInt;
@@ -43,7 +48,7 @@ initialize_words:
 			allText[i] += 32;
 		}
 		currentAllTextLen++;
-		if (currentAllTextLen >= allTextLen)
+		if (currentAllTextLen >= allTextLen) //expand allText
 		{
 			allTextLen *= 2;
 			newArrayChar = new char[allTextLen];
@@ -86,37 +91,64 @@ initialize_words:
 					j++;
 					if (j < nextWord - prevWord)
 						goto copy_word;
+
+					wordsArray[currentWordsArrayLen][j] = '\0';
+
 					prevWord = nextWord + 1;
 
 
 			j = 0;   //find a word in the array
 			if (currentWordsArrayLen != 0)
 			{
+				isStopWord = false;
+				isOldWord = false;
 			finding_word:
-				fl = true;
+				isOldWord = true;
 				if (currentWordsLen[currentWordsArrayLen] != currentWordsLen[j])
-					fl = false;
-				if (fl)
+					isOldWord = false;
+				if (isOldWord)
 				{
 					k = 0;
 				compare_words:
 					if (wordsArray[currentWordsArrayLen][k] != wordsArray[j][k])
 					{
-						fl = false;
+						isOldWord = false;
 					}
 					k++;
-					if (fl && k < currentWordsLen[currentWordsArrayLen])
+					if (isOldWord && k < currentWordsLen[currentWordsArrayLen])
 						goto compare_words;
 				}
-				if (fl)
-				{
-					termFreequency[j]++;
-					currentWordsLen[currentWordsArrayLen] = 0;
-					currentWordsArrayLen--;
-				}
+
+
 				j++;
-				if (!fl && j < currentWordsArrayLen)
+				if (!isOldWord && j < currentWordsArrayLen)
 					goto finding_word;
+
+			}
+			if (!isOldWord) //find word in stop words
+			{
+				for (int i = 0; i < stopWordsLen; i++)
+				{
+					isStopWord = true;
+					k = 0;
+					while (stopWords[i][k] != '\0' && stopWords[i][k] == wordsArray[currentWordsArrayLen][k])
+						k++;
+					if (stopWords[i][k] != wordsArray[currentWordsArrayLen][k])
+						isStopWord = false;
+					if (isStopWord)
+						break;
+				}
+			}
+			if (isOldWord) //dont remember word
+			{
+				termFreequency[j - 1]++;
+				currentWordsLen[currentWordsArrayLen] = 0;
+				currentWordsArrayLen--;
+			}
+			if (isStopWord)
+			{
+				currentWordsLen[currentWordsArrayLen] = 0;
+				currentWordsArrayLen--;
 			}
 			currentWordsArrayLen++;
 
@@ -190,15 +222,10 @@ initialize_words:
 
 		for (int i = 0; i < currentWordsArrayLen; i++)
 		{
-			for (int j = 0; j < currentWordsLen[i]; j++)
-			{
-				std::cout << wordsArray[i][j];
-			}
+				std::cout << wordsArray[i];
 			std::cout << " " << termFreequency[i] + 1 << "\n";
 		}
 	}
-
-
 
 	// end of reading input
 	return 0;
