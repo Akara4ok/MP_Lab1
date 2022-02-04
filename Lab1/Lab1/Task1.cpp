@@ -275,51 +275,7 @@ initialize_words:
 
 	//output result
 
-	if (fopen_s(&fp, "D:\\output.txt", "w") == 0) {
-		//for (int i = 0; i < currentWordsArrayLen; i++)
-		//{
-		//	/*std::cout << wordsArray[i];
-		//	std::cout << " " << termFreequency[i] + 1 << "\n";*/
-
-		//	wordsArray[i][currentWordsLen[i] - 1] = ' ';
-		//	copyInt = termFreequency[i] + 1;
-		//	count = 0;;
-		//	intToString = new char[10];
-
-		//	j = 0;
-		//	while (copyInt > 0)
-		//	{
-		//		intToString[j] = (char)48 + (copyInt % 10);
-		//		copyInt = copyInt / 10;
-		//		j++;
-		//		count++;
-		//	}
-		//	for (int j = 0; j < count; j++)
-		//	{
-		//		wordsArray[i][currentWordsLen[i]] = intToString[count - 1 - j];
-		//		currentWordsLen[i]++;
-
-		//		if (currentWordsLen[currentWordsArrayLen] >= wordsLen[currentWordsArrayLen]) // expand string
-		//		{
-		//			wordsLen[currentWordsArrayLen] *= 2;
-		//			newArrayChar = new char[wordsLen[currentWordsArrayLen]];
-		//			k = 0;
-		//		expand_char_rewrite3:
-		//			newArrayChar[k] = wordsArray[currentWordsArrayLen][k];
-		//			k++;
-		//			if (k < wordsLen[currentWordsArrayLen] / 2)
-		//				goto expand_char_rewrite3;
-		//			delete[] wordsArray[currentWordsArrayLen];
-		//			wordsArray[currentWordsArrayLen] = newArrayChar;
-		//		}
-		//	}
-		//	wordsArray[i][currentWordsLen[i]] = '\n';
-		//	currentWordsLen[i]++;
-		//	wordsArray[i][currentWordsLen[i]] = '\0';
-		//	fputs(wordsArray[i], fp);
-		//	delete[] intToString;
-		//}
-
+	if (fopen_s(&fp, "D:\\output.txt", "w") == 0 && currentWordsArrayLen) {
 		i = 0;
 	output_result:
 		wordsArray[i][currentWordsLen[i] - 1] = ' ';
@@ -365,7 +321,7 @@ initialize_words:
 		fputs(wordsArray[i], fp);
 		delete[] intToString;
 		i++;
-		if (i < currentWordsArrayLen)
+		if (i < currentWordsArrayLen && i < N)
 			goto output_result;
 	}
 	return 0;
