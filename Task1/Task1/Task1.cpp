@@ -21,7 +21,6 @@ int main() {
 
 	int* wordsLen = new int[wordsArrayLen];
 	int* currentWordsLen = new int[wordsArrayLen]();
-	char* intToString;
 
 	i = 0;
 initialize_words:
@@ -44,11 +43,6 @@ initialize_words:
 	//for sort
 	int temp;
 	char* tempWord;
-
-
-	//for output
-	int copyInt;
-	int count;
 
 
 	//read input
@@ -283,47 +277,11 @@ initialize_words:
 		currentWordsLen[i]++;
 		wordsArray[i][currentWordsLen[i]] = ' ';
 		currentWordsLen[i]++;
-		copyInt = termFreequency[i] + 1;
-		count = 0;;
-		intToString = new char[10];
-
-		j = 0;
-	copy_int_in_string:
-		intToString[j] = (char)48 + (copyInt % 10);
-		copyInt = copyInt / 10;
-		j++;
-		count++;
-		if (copyInt > 0)
-			goto copy_int_in_string;
-
-		j = 0;
-	add_int_to_string:
-		wordsArray[i][currentWordsLen[i]] = intToString[count - 1 - j];
-		currentWordsLen[i]++;
-
-		if (currentWordsLen[currentWordsArrayLen] >= wordsLen[currentWordsArrayLen]) // expand string
-		{
-			wordsLen[currentWordsArrayLen] *= 2;
-			newArrayChar = new char[wordsLen[currentWordsArrayLen]];
-			k = 0;
-		expand_char_rewrite3:
-			newArrayChar[k] = wordsArray[currentWordsArrayLen][k];
-			k++;
-			if (k < wordsLen[currentWordsArrayLen] / 2)
-				goto expand_char_rewrite3;
-			delete[] wordsArray[currentWordsArrayLen];
-			wordsArray[currentWordsArrayLen] = newArrayChar;
-		}
-		j++;
-		if (j < count)
-			goto add_int_to_string;
-
-
-		wordsArray[i][currentWordsLen[i]] = '\n';
-		currentWordsLen[i]++;
 		wordsArray[i][currentWordsLen[i]] = '\0';
+		
 		fputs(wordsArray[i], fp);
-		delete[] intToString;
+		fprintf(fp, "%d", termFreequency[i]);
+		fputc('\n', fp);
 		i++;
 		if (i < currentWordsArrayLen && i < N)
 			goto output_result;

@@ -23,7 +23,6 @@ int main() {
 
 	int* wordsLen = new int[wordsArrayLen];
 	int* currentWordsLen = new int[wordsArrayLen]();
-	char* intToString;
 
 
 	int** pagesArray = new int*[wordsArrayLen];
@@ -55,11 +54,6 @@ initialize_words:
 	char* tempWord;
 	int* wordPages;
 	bool isNeedSwap = false;
-
-
-	//for output
-	int copyInt;
-	int count;
 
 
 	//read input
@@ -113,7 +107,6 @@ initialize_words:
 				delete[] wordsArray[currentWordsArrayLen];
 				wordsArray[currentWordsArrayLen] = newArrayChar;
 			}
-		continue_pushing_word:
 			j++;
 			if (j < nextWord - prevWord)
 				goto copy_word;
@@ -379,76 +372,32 @@ initialize_words:
 	}
 	fclose(fp);
 
-
-
-	//output result
-
-	//if (fopen_s(&fp, "D:\\output.txt", "w") == 0 && currentWordsArrayLen) {
-	//	i = 0;
-	//output_result:
-	//	wordsArray[i][currentWordsLen[i] - 1] = ' ';
-	//	wordsArray[i][currentWordsLen[i]] = '-';
-	//	currentWordsLen[i]++;
-	//	wordsArray[i][currentWordsLen[i]] = ' ';
-	//	currentWordsLen[i]++;
-	//	copyInt = termFreequency[i] + 1;
-	//	count = 0;;
-	//	intToString = new char[10];
-
-	//	j = 0;
-	//copy_int_in_string:
-	//	intToString[j] = (char)48 + (copyInt % 10);
-	//	copyInt = copyInt / 10;
-	//	j++;
-	//	count++;
-	//	if (copyInt > 0)
-	//		goto copy_int_in_string;
-
-	//	j = 0;
-	//add_int_to_string:
-	//	wordsArray[i][currentWordsLen[i]] = intToString[count - 1 - j];
-	//	currentWordsLen[i]++;
-
-	//	if (currentWordsLen[currentWordsArrayLen] >= wordsLen[currentWordsArrayLen]) // expand string
-	//	{
-	//		wordsLen[currentWordsArrayLen] *= 2;
-	//		newArrayChar = new char[wordsLen[currentWordsArrayLen]];
-	//		k = 0;
-	//	expand_char_rewrite3:
-	//		newArrayChar[k] = wordsArray[currentWordsArrayLen][k];
-	//		k++;
-	//		if (k < wordsLen[currentWordsArrayLen] / 2)
-	//			goto expand_char_rewrite3;
-	//		delete[] wordsArray[currentWordsArrayLen];
-	//		wordsArray[currentWordsArrayLen] = newArrayChar;
-	//	}
-	//	j++;
-	//	if (j < count)
-	//		goto add_int_to_string;
-
-
-	//	wordsArray[i][currentWordsLen[i]] = '\n';
-	//	currentWordsLen[i]++;
-	//	wordsArray[i][currentWordsLen[i]] = '\0';
-	//	fputs(wordsArray[i], fp);
-	//	delete[] intToString;
-	//	i++;
-	//	if (i < currentWordsArrayLen && i < N)
-	//		goto output_result;
-	//}
-	for (int i = 0; i < currentWordsArrayLen; i++)
-	{
-		if (wordsArray[i][0] == 'm' && wordsArray[i][1] == 'r')
-			int k = currentPagesLen[i];
+	if (fopen_s(&fp, "D:\\output.txt", "w") == 0 && currentWordsArrayLen) { //output result
+		i = 0;
+	output_result:
 		if (currentPagesLen[i] < maxPages + 1)
 		{
-			std::cout << wordsArray[i] << " ";
-			for (int j = 0; j < currentPagesLen[i]; j++)
-			{
-				std::cout << pagesArray[i][j] << " ";
-			}
-			std::cout << "\n";
+			wordsArray[i][currentWordsLen[i] - 1] = ' '; //output word
+			wordsArray[i][currentWordsLen[i]] = '-';
+			currentWordsLen[i]++;
+			wordsArray[i][currentWordsLen[i]] = ' ';
+			currentWordsLen[i]++;
+			wordsArray[i][currentWordsLen[i]] = '\0';
+
+			fputs(wordsArray[i], fp);
+			j = 0;
+			output_pages:
+				fprintf(fp, "%d", pagesArray[i][j]);
+				if (j != currentPagesLen[i] - 1)
+					fputs(", ", fp);
+				j++;
+				if (j < currentPagesLen[i])
+					goto output_pages;
+			fputc('\n', fp);
 		}
+		i++;
+		if (i < currentWordsArrayLen)
+			goto output_result;
 	}
 	return 0;
 }
