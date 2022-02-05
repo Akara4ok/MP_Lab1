@@ -10,6 +10,7 @@ int main() {
 	int nextWord = 0;
 
 	const int N = 45; // strings in one page
+	const int maxPages = 100; // strings in one page
 	int currentString = 0;
 
 	int allTextLen = 101;
@@ -52,6 +53,8 @@ initialize_words:
 	//for sort
 	int temp;
 	char* tempWord;
+	int* wordPages;
+	bool isNeedSwap = false;
 
 
 	//for output
@@ -152,19 +155,22 @@ initialize_words:
 				{
 					currentWordsLen[currentWordsArrayLen] = 0;
 					currentPagesLen[currentWordsArrayLen] = 0;
-					pagesArray[j][currentPagesLen[j]] = (currentString / N) + 1;
-					currentPagesLen[j]++;
-					if (currentPagesLen[j] >= pagesLen[j]) {
-						pagesLen[j] *= 2;
-						newArrayInt = new int[pagesLen[j]]();
-						k = 0;
-					expand_int_rewrite0:
-						newArrayInt[k] = pagesArray[j][k];
-						k++;
-						if (k < pagesLen[j] / 2)
-							goto expand_int_rewrite0;
-						delete[] pagesArray[j];
-						pagesArray[j] = newArrayInt;
+					if (currentPagesLen[j] <= maxPages + 1)
+					{
+						pagesArray[j][currentPagesLen[j]] = (currentString / N) + 1; // remeber a page
+						currentPagesLen[j]++;
+						if (currentPagesLen[j] >= pagesLen[j]) {
+							pagesLen[j] *= 2;
+							newArrayInt = new int[pagesLen[j]]();
+							k = 0;
+						expand_int_rewrite0:
+							newArrayInt[k] = pagesArray[j][k];
+							k++;
+							if (k < pagesLen[j] / 2)
+								goto expand_int_rewrite0;
+							delete[] pagesArray[j];
+							pagesArray[j] = newArrayInt;
+						}
 					}
 					currentWordsArrayLen--;
 				}
@@ -325,34 +331,51 @@ initialize_words:
 
 
 		//sort
-	//	i = 0;
-	//sort_outer_loop:
-	//	j = i + 1;
-	//sort_inner_loop:
-	//	if (termFreequency[i] < termFreequency[j])
-	//	{
-	//		temp = termFreequency[i]; //swap tempFreequency
-	//		termFreequency[i] = termFreequency[j];
-	//		termFreequency[j] = temp;
+		i = 0;
+	sort_outer_loop:
+		j = i + 1;
+	sort_inner_loop:
+		k = 0;
+		isNeedSwap = false;
+		while (wordsArray[i][k] != 0 && wordsArray[i][k] == wordsArray[j][k])
+		{
+			k++;
+		}
+		isNeedSwap = wordsArray[i][k] > wordsArray[j][k];
+		if (isNeedSwap)
+		{
+			wordPages = pagesArray[i]; //swap pages
+			pagesArray[i] = pagesArray[j];
+			pagesArray[j] = wordPages;
 
-	//		tempWord = wordsArray[i]; //swap words
-	//		wordsArray[i] = wordsArray[j];
-	//		wordsArray[j] = tempWord;
+			temp = pagesLen[i]; //swap mex len pages
+			pagesLen[i] = pagesLen[j];
+			pagesLen[j] = temp;
 
-	//		temp = wordsLen[i]; //swap mex len words
-	//		wordsLen[i] = wordsLen[j];
-	//		wordsLen[j] = temp;
 
-	//		temp = currentWordsLen[i]; //swap current len words
-	//		currentWordsLen[i] = currentWordsLen[j];
-	//		currentWordsLen[j] = temp;
-	//	}
-	//	j++;
-	//	if (j < currentWordsArrayLen)
-	//		goto sort_inner_loop;
-	//	i++;
-	//	if (i < currentWordsArrayLen - 1)
-	//		goto sort_outer_loop;
+			temp = currentPagesLen[i]; //swap current len pages
+			currentPagesLen[i] = currentPagesLen[j];
+			currentPagesLen[j] = temp;
+
+
+			tempWord = wordsArray[i]; //swap words
+			wordsArray[i] = wordsArray[j];
+			wordsArray[j] = tempWord;
+
+			temp = wordsLen[i]; //swap mex len words
+			wordsLen[i] = wordsLen[j];
+			wordsLen[j] = temp;
+
+			temp = currentWordsLen[i]; //swap current len words
+			currentWordsLen[i] = currentWordsLen[j];
+			currentWordsLen[j] = temp;
+		}
+		j++;
+		if (j < currentWordsArrayLen)
+			goto sort_inner_loop;
+		i++;
+		if (i < currentWordsArrayLen - 1)
+			goto sort_outer_loop;
 	}
 	fclose(fp);
 
@@ -415,12 +438,17 @@ initialize_words:
 	//}
 	for (int i = 0; i < currentWordsArrayLen; i++)
 	{
-		std::cout << wordsArray[i] << " ";
-		for (int j = 0; j < currentPagesLen[i]; j++)
+		if (wordsArray[i][0] == 'm' && wordsArray[i][1] == 'r')
+			int k = currentPagesLen[i];
+		if (currentPagesLen[i] < maxPages + 1)
 		{
-			std::cout << pagesArray[i][j] << " ";
+			std::cout << wordsArray[i] << " ";
+			for (int j = 0; j < currentPagesLen[i]; j++)
+			{
+				std::cout << pagesArray[i][j] << " ";
+			}
+			std::cout << "\n";
 		}
-		std::cout << "\n";
 	}
 	return 0;
 }
