@@ -57,7 +57,7 @@ initialize_words:
 
 
 	//read input
-	if (fopen_s(&fp, "D:\\input.txt", "r") == 0) {
+	if (fopen_s(&fp, "input.txt", "r") == 0) {
 		i = 0;
 	reading:
 		allText[i] = fgetc(fp);
@@ -197,27 +197,6 @@ initialize_words:
 				currentWordsLen[currentWordsArrayLen] = 0;
 				currentWordsArrayLen--;
 			}
-
-
-
-			/*if (currentWordsArrayLen >= 0)
-			{
-				pagesArray[currentWordsArrayLen][currentPagesLen[currentWordsArrayLen]] = (currentString / N) + 1;
-				currentPagesLen[currentWordsArrayLen]++;
-				if (currentPagesLen[currentWordsArrayLen] >= pagesLen[currentWordsArrayLen]) {
-					pagesLen[currentWordsArrayLen] *= 2;
-					newArrayInt = new int[pagesLen[currentWordsArrayLen]]();
-					j = 0;
-				expand_int_rewrite0:
-					newArrayInt[j] = pagesArray[currentWordsArrayLen][j];
-					j++;
-					if (j < pagesLen[currentWordsArrayLen] / 2)
-						goto expand_int_rewrite0;
-					delete[] pagesArray[currentWordsArrayLen];
-					pagesArray[currentWordsArrayLen] = newArrayInt;
-				}
-			}*/
-
 
 			currentWordsArrayLen++;
 			if (currentWordsArrayLen >= wordsArrayLen) //expand word array
@@ -372,7 +351,7 @@ initialize_words:
 	}
 	fclose(fp);
 
-	if (fopen_s(&fp, "D:\\output.txt", "w") == 0 && currentWordsArrayLen) { //output result
+	if (fopen_s(&fp, "output.txt", "w") == 0 && currentWordsArrayLen) { //output result
 		i = 0;
 	output_result:
 		if (currentPagesLen[i] < maxPages + 1)

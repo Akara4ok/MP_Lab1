@@ -46,7 +46,7 @@ initialize_words:
 
 
 	//read input
-	if (fopen_s(&fp, "D:\\input.txt", "r") == 0) {
+	if (fopen_s(&fp, "input.txt", "r") == 0) {
 		i = 0;
 	reading:
 		allText[i] = fgetc(fp);
@@ -269,7 +269,7 @@ initialize_words:
 
 	//output result
 
-	if (fopen_s(&fp, "D:\\output.txt", "w") == 0 && currentWordsArrayLen) {
+	if (fopen_s(&fp, "output.txt", "w") == 0 && currentWordsArrayLen) {
 		i = 0;
 	output_result:
 		wordsArray[i][currentWordsLen[i] - 1] = ' ';
@@ -280,7 +280,7 @@ initialize_words:
 		wordsArray[i][currentWordsLen[i]] = '\0';
 		
 		fputs(wordsArray[i], fp);
-		fprintf(fp, "%d", termFreequency[i]);
+		fprintf(fp, "%d", termFreequency[i] + 1);
 		fputc('\n', fp);
 		i++;
 		if (i < currentWordsArrayLen && i < N)
